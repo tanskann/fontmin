@@ -1,11 +1,13 @@
-var spawn = require('child_process').spawn;
-var fs = require('fs');
-var path = require('path');
+import { spawn } from 'child_process';
+import fs from 'fs';
+import path from 'path';
 
-var bin = path.resolve(path.join(__dirname, '/../cli'));
+var dirname = path.dirname((new URL(import.meta.url)).pathname);
+
+var bin = path.resolve(path.join(dirname, '/../cli.js'));
 
 var run = function (args, onErr, onEnd) {
-  var child = spawn('node', [bin].concat(args), { cwd: __dirname });
+  var child = spawn('node', [bin].concat(args), { cwd: dirname });
   var data = '';
   var err = '';
 
@@ -36,6 +38,14 @@ var run = function (args, onErr, onEnd) {
 
 describe('CLI', function () {
   it('should run', function (done) {
-    run([]);
+    var child = run([], function (err) {
+      throw err;
+    }, function () {
+      done();
+    });
+
+    setTimeout(function () {
+      child.kill();
+    }, 500);
   });
 });

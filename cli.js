@@ -103,7 +103,7 @@ function run(src, dest) {
         .use(Fontmin.css(pluginOpts));
 
     if (dest) {
-        dest(dest);
+        fontmin.dest(dest);
     }
 
     fontmin.run(function (err, files) {

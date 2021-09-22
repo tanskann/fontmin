@@ -112,12 +112,6 @@ function run(src, dest) {
             process.exit(1);
         }
 
-        if (!process.stdout.isTTY) {
-            files.forEach(function (file) {
-                process.stdout.write(file.contents);
-            });
-        }
-
         cli.flags.showTime && console.timeEnd('fontmin use');
     });
 }

@@ -103,8 +103,8 @@ function run(src, dest) {
         .use(Fontmin.ttf2woff2(pluginOpts))
         .use(Fontmin.css(pluginOpts));
 
-    if (process.stdout.isTTY) {
-        fontmin.dest(dest ? dest : 'build');
+    if (dest) {
+        dest(dest);
     }
 
     fontmin.run(function (err, files) {
@@ -123,40 +123,35 @@ function run(src, dest) {
     });
 }
 
-if (process.stdin.isTTY) {
-    var src = cli.input;
-    var dest;
+var src = cli.input;
+var dest;
 
-    if (!cli.input.length) {
-        console.error([
-            'Provide at least one file to optimize',
-            '',
-            'Example',
-            '  fontmin font/* build',
-            '  fontmin foo.ttf > foo-optimized.ttf',
-            '  cat foo.ttf | fontmin > foo-optimized.ttf',
-            '',
-            'See `fontmin --help` for more information.'
-        ].join('\n'));
+if (!cli.input.length) {
+    console.error([
+        'Provide at least one file to optimize',
+        '',
+        'Example',
+        '  fontmin font/* build',
+        '  fontmin foo.ttf > foo-optimized.ttf',
+        '  cat foo.ttf | fontmin > foo-optimized.ttf',
+        '',
+        'See `fontmin --help` for more information.'
+    ].join('\n'));
 
-        process.exit(1);
+    process.exit(1);
+}
+
+if (src.length > 1 && !isFile(src[src.length - 1])) {
+    dest = src[src.length - 1];
+    src.pop();
+}
+
+src = src.map(function (s) {
+    if (!isFile(s) && fs.existsSync(s)) {
+        return path.join(s, '**/*');
     }
 
-    if (src.length > 1 && !isFile(src[src.length - 1])) {
-        dest = src[src.length - 1];
-        src.pop();
-    }
+    return s;
+});
 
-    src = src.map(function (s) {
-        if (!isFile(s) && fs.existsSync(s)) {
-            return path.join(s, '**/*');
-        }
-
-        return s;
-    });
-
-    run(src, dest);
-}
-else {
-    stdin.buffer(run);
-}
+run(src, dest);
